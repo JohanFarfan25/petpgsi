@@ -8,7 +8,7 @@ use App\Services\MascotaService;
 use App\Services\AgendaService;
 use App\Services\NotificationService;
 use App\Models\Servicio;
-use App\Models\Cita; // Asegúrate de importar el modelo Cita
+use App\Models\Cita;
 use Illuminate\Support\Facades\Auth;
 
 class AgendaFacadeController extends Controller
