@@ -34,7 +34,7 @@ Asegúrate de tener instaladas las siguientes herramientas antes de comenzar:
 ### 1️⃣ Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/petpgsi.git
+git clone [https://github.com/tu-usuario/petpgsi.git](https://github.com/JohanFarfan25/petpgsi.git)
 cd petpgsi
 ```
 
