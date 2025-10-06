@@ -8,90 +8,69 @@ use Illuminate\Support\Facades\Auth;
 
 class MascotaController extends Controller
 {
-    /**
-     * Listar todas las mascotas del usuario autenticado
-     */
+    // ================= API =================
     public function index()
     {
-        $user = Auth::user();
-
-        $mascotas = Mascota::where('user_id', $user->id)->get();
-
-        return response()->json($mascotas);
+        return response()->json(Mascota::where('user_id', Auth::id())->get());
     }
-
-    /**
-     * Mostrar una mascota específica
-     */
     public function show($id)
     {
-        $mascota = Mascota::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->first();
-
-        if (!$mascota) {
-            return response()->json(['message' => 'Mascota no encontrada'], 404);
-        }
-
-        return response()->json($mascota);
+        $m = Mascota::where('id', $id)->where('user_id', Auth::id())->first();
+        return $m ? response()->json($m) : response()->json(['message' => 'Mascota no encontrada'], 404);
     }
-
-    /**
-     * Crear una nueva mascota
-     */
-    public function store(Request $request)
+    public function store(Request $r)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:100',
-            'especie' => 'required|string|max:50',
-            'raza' => 'nullable|string|max:50',
-            'fecha_nacimiento' => 'nullable|date'
-        ]);
-
-        $mascota = Mascota::create([
-            'user_id' => Auth::id(),
-            'nombre' => $request->nombre,
-            'especie' => $request->especie,
-            'raza' => $request->raza,
-            'fecha_nacimiento' => $request->fecha_nacimiento
-        ]);
-
-        return response()->json($mascota, 201);
+        $r->validate(['nombre' => 'required', 'especie' => 'required', 'raza' => 'nullable', 'fecha_nacimiento' => 'nullable|date']);
+        $m = Mascota::create(['user_id' => Auth::id(), 'nombre' => $r->nombre, 'especie' => $r->especie, 'raza' => $r->raza, 'fecha_nacimiento' => $r->fecha_nacimiento]);
+        return response()->json($m, 201);
     }
-
-    /**
-     * Actualizar una mascota existente
-     */
-    public function update(Request $request, $id)
+    public function update(Request $r, $id)
     {
-        $mascota = Mascota::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->first();
-
-        if (!$mascota) {
-            return response()->json(['message' => 'Mascota no encontrada'], 404);
-        }
-
-        $mascota->update($request->only(['nombre', 'especie', 'raza', 'fecha_nacimiento']));
-
-        return response()->json($mascota);
+        $m = Mascota::where('id', $id)->where('user_id', Auth::id())->first();
+        if (!$m) return response()->json(['message' => 'Mascota no encontrada'], 404);
+        $m->update($r->only(['nombre', 'especie', 'raza', 'fecha_nacimiento']));
+        return response()->json($m);
     }
-
-    /**
-     * Eliminar una mascota
-     */
     public function destroy($id)
     {
-        $mascota = Mascota::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->first();
+        $m = Mascota::where('id', $id)->where('user_id', Auth::id())->first();
+        if (!$m) return response()->json(['message' => 'Mascota no encontrada'], 404);
+        $m->delete();
+        return response()->json(['message' => 'Mascota eliminada']);
+    }
 
-        if (!$mascota) {
-            return response()->json(['message' => 'Mascota no encontrada'], 404);
-        }
-
-        $mascota->delete();
-
-        return response()->json(['message' => 'Mascota eliminada correctamente']);
+    // ================= WEB =================
+    public function indexWeb()
+    {
+        $mascotas = Mascota::where('user_id', Auth::id())->get();
+        return view('mascotas.index', compact('mascotas'));
+    }
+    public function create()
+    {
+        return view('mascotas.create');
+    }
+    public function storeWeb(Request $r)
+    {
+        $r->validate(['nombre' => 'required', 'especie' => 'required', 'raza' => 'nullable', 'fecha_nacimiento' => 'nullable|date']);
+        Mascota::create(['user_id' => Auth::id(), 'nombre' => $r->nombre, 'especie' => $r->especie, 'raza' => $r->raza, 'fecha_nacimiento' => $r->fecha_nacimiento]);
+        return redirect()->route('mascotas.index')->with('success', 'Mascota creada correctamente');
+    }
+    public function edit($id)
+    {
+        $m = Mascota::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        return view('mascotas.edit', ['mascota' => $m]);
+    }
+    public function updateWeb(Request $r, $id)
+    {
+        $m = Mascota::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $r->validate(['nombre' => 'required', 'especie' => 'required', 'raza' => 'nullable', 'fecha_nacimiento' => 'nullable|date']);
+        $m->update($r->only(['nombre', 'especie', 'raza', 'fecha_nacimiento']));
+        return redirect()->route('mascotas.index')->with('success', 'Mascota actualizada correctamente');
+    }
+    public function destroyWeb($id)
+    {
+        $m = Mascota::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $m->delete();
+        return redirect()->route('mascotas.index')->with('success', 'Mascota eliminada correctamente');
     }
 }

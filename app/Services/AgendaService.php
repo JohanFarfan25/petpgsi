@@ -26,4 +26,8 @@ class AgendaService {
     public function listByUser(int $userId){
         return Cita::with(['mascota','servicio'])->where('user_id',$userId)->get();
     }
+
+    public function getById(int $id): ?Cita {
+        return Cita::with(['mascota','servicio'])->find($id);
+    }
 }

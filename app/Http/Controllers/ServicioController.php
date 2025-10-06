@@ -7,56 +7,69 @@ use App\Models\Servicio;
 
 class ServicioController extends Controller
 {
-    // 🩺 Obtener todos los servicios
+    // ================= API =================
     public function index()
     {
         return response()->json(Servicio::all());
     }
-
-    // 🩺 Obtener un servicio específico
     public function show($id)
     {
-        $servicio = Servicio::find($id);
-        if (!$servicio) {
-            return response()->json(['error' => 'Servicio no encontrado'], 404);
-        }
-        return response()->json($servicio);
+        $s = Servicio::find($id);
+        return $s ? response()->json($s) : response()->json(['error' => 'Servicio no encontrado'], 404);
     }
-
-    // 🩺 Crear un nuevo servicio (solo admin o pruebas)
     public function store(Request $r)
     {
-        $data = $r->validate([
-            'nombre' => 'required|string',
-            'duracion_minutos' => 'required|integer|min:5',
-            'precio' => 'required|numeric|min:0',
-        ]);
-
-        $servicio = Servicio::create($data);
-        return response()->json($servicio, 201);
+        $d = $r->validate(['nombre' => 'required', 'duracion_minutos' => 'required|int', 'precio' => 'required|numeric']);
+        $s = Servicio::create($d);
+        return response()->json($s, 201);
     }
-
-    // 🩺 Actualizar servicio
     public function update(Request $r, $id)
     {
-        $servicio = Servicio::find($id);
-        if (!$servicio) {
-            return response()->json(['error' => 'Servicio no encontrado'], 404);
-        }
-
-        $servicio->update($r->only(['nombre', 'duracion_minutos', 'precio']));
-        return response()->json($servicio);
+        $s = Servicio::find($id);
+        if (!$s) return response()->json(['error' => 'Servicio no encontrado'], 404);
+        $s->update($r->only(['nombre', 'duracion_minutos', 'precio']));
+        return response()->json($s);
     }
-
-    // 🩺 Eliminar servicio
     public function destroy($id)
     {
-        $servicio = Servicio::find($id);
-        if (!$servicio) {
-            return response()->json(['error' => 'Servicio no encontrado'], 404);
-        }
-
-        $servicio->delete();
+        $s = Servicio::find($id);
+        if (!$s) return response()->json(['error' => 'Servicio no encontrado'], 404);
+        $s->delete();
         return response()->json(['message' => 'Servicio eliminado']);
+    }
+
+    // ================= WEB =================
+    public function indexWeb()
+    {
+        $servicios = Servicio::all();
+        return view('servicios.index', compact('servicios'));
+    }
+    public function create()
+    {
+        return view('servicios.create');
+    }
+    public function storeWeb(Request $r)
+    {
+        $d = $r->validate(['nombre' => 'required', 'duracion_minutos' => 'required|int', 'precio' => 'required|numeric']);
+        Servicio::create($d);
+        return redirect()->route('servicios.index')->with('success', 'Servicio creado correctamente');
+    }
+    public function edit($id)
+    {
+        $s = Servicio::findOrFail($id);
+        return view('servicios.edit', ['servicio' => $s]);
+    }
+    public function updateWeb(Request $r, $id)
+    {
+        $s = Servicio::findOrFail($id);
+        $d = $r->validate(['nombre' => 'required', 'duracion_minutos' => 'required|int', 'precio' => 'required|numeric']);
+        $s->update($d);
+        return redirect()->route('servicios.index')->with('success', 'Servicio actualizado correctamente');
+    }
+    public function destroyWeb($id)
+    {
+        $s = Servicio::findOrFail($id);
+        $s->delete();
+        return redirect()->route('servicios.index')->with('success', 'Servicio eliminado correctamente');
     }
 }
