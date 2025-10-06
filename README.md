@@ -41,12 +41,12 @@ bash
 Copy code
 composer install
 3️⃣ Configurar el entorno
-Copia el archivo .env.example a .env:
+Copia el archivo de entorno base:
 
 bash
 Copy code
 cp .env.example .env
-Abre el archivo .env y ajusta las variables según tu entorno local:
+Luego abre el archivo .env y ajusta las variables según tu entorno local:
 
 env
 Copy code
@@ -72,19 +72,18 @@ php artisan key:generate
 bash
 Copy code
 php artisan jwt:secret
-Esto creará una clave única en tu .env (campo JWT_SECRET).
+Esto creará la clave única JWT_SECRET en tu archivo .env.
 
 6️⃣ Ejecutar las migraciones
-Crea las tablas necesarias en la base de datos:
-
 bash
 Copy code
 php artisan migrate
-7️⃣ Ejecutar el servidor local
+7️⃣ Levantar el servidor local
 bash
 Copy code
 php artisan serve
 Tu aplicación estará disponible en:
+
 👉 http://127.0.0.1:8000
 
 🧠 Endpoints principales
@@ -137,7 +136,7 @@ curl -X POST http://127.0.0.1:8000/api/mascotas \
   "raza": "Labrador",
   "fecha_nacimiento": "2021-05-10"
 }'
-💾 Estructura principal del proyecto
+💾 Estructura del proyecto
 pgsql
 Copy code
 petpgsi/
@@ -162,3 +161,6 @@ petpgsi/
 Autor: Johan Alexander Farfán Sierra
 📧 johanfarfan.dev@gmail.com
 💻 Proyecto académico - Arquitectura de Software
+
+📜 Licencia
+Este proyecto está bajo la licencia MIT, lo que significa que puedes modificarlo y distribuirlo libremente siempre que mantengas la atribución al autor original.
